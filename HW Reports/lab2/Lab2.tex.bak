@@ -1,0 +1,212 @@
+\documentclass{article}
+
+\input{structure.tex} % Include the file specifying the document structure and custom commands
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\renewcommand{\thealgocf}{} % Stop numbering in header of algorithms
+\SetKwRepeat{Do}{do}{while} % Do while loop for algorithms
+
+%----------------------------------------------------------------------------------------
+%	ASSIGNMENT INFORMATION
+%----------------------------------------------------------------------------------------
+
+\title{EELE465 Lab 2} % Title of the assignment
+
+\author{Ryan French\\ \texttt{ryanfrench3@montana.edu}} % Author name and email address
+
+\date{Montana State University --- \today} % University, school and/or department name(s) and a date
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+%	INTRODUCTION
+%----------------------------------------------------------------------------------------
+
+\section*{Introduction}
+
+The MSP430FR2310 is a 16-bit RISC architecture microcontroller with 11 GPIO pins. This microcontroller is of the same family as the MSP430FR2355 Launchpad, which means that we can use the on-board programmer to flash firmware onto the chip. Setting up I2C communication between the two microcontrollers allows the MPS430FR2355 to be used as a master which can read input from a membrane keypad and the MSP430FR2310 to be used as a slave device that controls a system of 8 LEDs. Input from the keypad shall be used to select from four distinct LED patterns.
+
+
+%\begin{info} % Information block
+%	This is an interesting piece of information, to which the reader should pay special attention. Fusce varius orci ac magna dapibus porttitor. In tempor leo a neque bibendum sollicitudin. Nulla pretium fermentum nisi, eget sodales magna facilisis eu. Praesent aliquet nulla ut bibendum lacinia. Donec vel mauris vulputate, commodo ligula ut, egestas orci. Suspendisse commodo odio sed hendrerit lobortis. Donec finibus eros erat, vel ornare enim mattis et.
+%\end{info}
+%----------------------------------------------------------------------------------------
+
+
+%----------------------------------------------------------------------------------------
+%	SETUP
+%----------------------------------------------------------------------------------------
+
+\section*{Setup}
+
+Setting up I2C connections is simple, as one only needs to run two wires with 10k pull-up resistors, which are placed close to each of the microcontrollers. Because of the limited current output of the GPIO pins, a flip-flop must be used to control the output to the LED bar.  One of the master GPIO pins was attached to the slave's reset pin, as there was a consistent hang-up while switching between modes (this is something that will be diagnosed and fixed in the future). 
+
+\noindent The master was connected to the membrane keypad through eight GPIO pins. The driven pins were connected to a quad or-gate, which was used simply to monitor an interrupt, which occurs when any of the buttons is pressed. See the Eagle schematic for the full circuit.
+
+%----------------------------------------------------------------------------------------
+
+
+% Numbered question, with subquestions in an enumerate environment
+%\begin{question}
+%	Quisque ullamcorper placerat ipsum. Cras nibh. Morbi vel justo vitae lacus tincidunt ultrices. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+%
+%	% Subquestions numbered with letters
+%	\begin{enumerate}[(a)]
+%		\item Do this.
+%		\item Do that.
+%		\item Do something else.
+%	\end{enumerate}
+%\end{question}
+%	
+%------------------------------------------------
+
+
+%----------------------------------------------------------------------------------------
+%	SOLUTION 1
+%----------------------------------------------------------------------------------------
+
+\section*{Solution}
+\subsection*{Master Routines}
+
+The master in the circuit was programmed under the Energia IDE (a branch of Arduino), so it was easy to implement I2C communication with the native Wire library. Reading the keypad with the master involved a simple algorithm, where the column pins were designated as outputs, and rows were designated as inputs. With the column pins high, the main loop scanned the interrupt pin until it went high. The entire algorithm is shown below:
+
+%\subsection*{Algorithm}
+
+\begin{center}
+	\begin{minipage}{0.6\linewidth} % Adjust the minipage width to accomodate for the length of algorithm lines
+		\begin{algorithm}[H]
+%			\KwIn{$(N, DEC)$:  Number of Loops, Decrement Initial Value}  % Algorithm inputs
+			%\KwResult{$(c, d)$, such that $a+b = c + d$} % Algorithm outputs/results
+			\medskip
+			Clear Column Pins\;
+			\For {column pins}{
+			Set Column Pin\;
+			\For {row pins}{
+			Read Pin\;
+			\If {read pin}{
+			add\_button\_press()\;
+			}
+			}
+			Clear Column Pin\;
+			}
+			Set Column Pins\;
+			Send I2C data\;
+			\caption{Read Key Press} % Algorithm name
+			\label{alg:KeyPress}   % optional label to refer to
+		\end{algorithm}
+	\end{minipage}
+\end{center}
+
+\noindent As shown, the algorithm is simple and very quick. Custom digital pin read/write functions were written because of the large overhead of the methods included with Energia.
+
+\subsection*{Slave Routines}
+
+Something that isn't immediately obvious for the MSP430FR2310 is the need to unlock LPM5, which is to say that all pins must be unlocked from their high-impedance mode. Energia doesn't yet support this microcontroller, so all developing was done in Code Composer Studio. Setting up I2C is made easier with a CCS library called driverlib, which is a high-level library for setting up different communication protocols. Using these methods, the SDA and SCL were set up as I2C and an interrupt was attached.\\
+
+\noindent The main loop is simple, it just constantly scans for a global flag which identifies that I2C data is available to use. A switch-case statement handles this data, as it selects the LED pattern. The patterns are generated using a custom function that takes a byte and uses it as a bitmask. Each bit is cycled through and the corresponding LED pin is written/cleared. The slave's code is detailed in flowchart \ref{fig:Flowchart}.
+
+%----------------------------------------------------------------------------------------
+
+%% Numbered question, with an optional title
+%\begin{question}[\itshape (with optional title)]
+%
+%\end{question}
+
+
+%----------------------------------------------------------------------------------------
+%	COMMENTS
+%----------------------------------------------------------------------------------------
+\section*{Comments}
+
+This lab went pretty smoothly, but the largest issue was setting up I2C protocol on the MSP430FR2310. The datasheets weren't entire clear on how to accomplish this, and the example code that I could find didn't work. After messing around with interrupts and 
+
+%----------------------------------------------------------------------------------------
+
+
+
+%----------------------------------------------------------------------------------------
+%	Implementation
+%----------------------------------------------------------------------------------------
+
+%\section{Implementation}
+%
+%% File contents
+%\begin{file}[hello.py]
+%\begin{lstlisting}[language=Python]
+%#! /usr/bin/python
+%
+%import sys
+%sys.stdout.write("Hello World!\n")
+%\end{lstlisting}
+%\end{file}
+
+%----------------------------------------------------------------------------------------
+
+%% Command-line "screenshot"
+%\begin{commandline}
+%	\begin{verbatim}
+%		$ chmod +x hello.py
+%		$ ./hello.py
+%
+%		Hello World!
+%	\end{verbatim}
+%\end{commandline}
+
+%% Warning text, with a custom title
+%\begin{warn}[Notice:]
+%  In congue risus leo, in gravida enim viverra id. Donec eros mauris, bibendum vel dui at, tempor commodo augue. In vel lobortis lacus. Nam ornare ullamcorper mauris vel molestie. Maecenas vehicula ornare turpis, vitae fringilla orci consectetur vel. Nam pulvinar justo nec neque egestas tristique. Donec ac dolor at libero congue varius sed vitae lectus. Donec et tristique nulla, sit amet scelerisque orci. Maecenas a vestibulum lectus, vitae gravida nulla. Proin eget volutpat orci. Morbi eu aliquet turpis. Vivamus molestie urna quis tempor tristique. Proin hendrerit sem nec tempor sollicitudin.
+%\end{warn}
+
+\pagebreak
+
+\section*{Appendix}
+
+\begin{centering}
+\begin{figure}[H]
+%\label{fig:Flowchart}
+\centering
+\includegraphics[width = 0.6\textwidth]{flowchart.png}
+\captionsetup{format = hang, width = 0.75\textwidth}
+\caption{MSP430FR2310's code}
+\label{fig:Flowchart}
+\end{figure}
+\end{centering}
+
+\pagebreak
+
+%\begin{centering}
+%\begin{figure}[H]
+%\label{system}
+%\centering
+%\includegraphics[width = 0.6\textwidth]{Lab0_part2.png}
+%\captionsetup{format = hang, width = 0.75\textwidth}
+%\caption{Timer Interrupt Solution}
+%\label{fig:Int}
+%\end{figure}
+%\end{centering}
+%
+%\pagebreak
+%
+%\begin{centering}
+%\begin{figure}[H]
+%\label{system}
+%\centering
+%\includegraphics[width = 0.75\textwidth]{Lab0_part3.png}
+%\captionsetup{format = hang, width = 0.75\textwidth}
+%\caption{Combined Solution}
+%\label{fig:DecInt}
+%\end{figure}
+%\end{centering}
+
+
+
+%----------------------------------------------------------------------------------------
+%	END OF DOCUMENT
+%----------------------------------------------------------------------------------------
+
+\end{document}

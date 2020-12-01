@@ -1,0 +1,19 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Purpose \046 Theory}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{LED Bar Graph}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{4x4 Membrane Keypad}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{LCD}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.4}{LM92 Temperature Sensor}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.5}{LM19 Temperature Sensor}{section.2}% 7
+\BOOKMARK [2][-]{subsection.2.6}{DHT22 Temperature \046 Humidity Sensor}{section.2}% 8
+\BOOKMARK [2][-]{subsection.2.7}{DS1337 Real Time Clock}{section.2}% 9
+\BOOKMARK [2][-]{subsection.2.8}{Thermoelectric Heat Pump}{section.2}% 10
+\BOOKMARK [1][-]{section.3}{Microntroller Implementation}{}% 11
+\BOOKMARK [2][-]{subsection.3.1}{Master}{section.3}% 12
+\BOOKMARK [2][-]{subsection.3.2}{LED Slave}{section.3}% 13
+\BOOKMARK [2][-]{subsection.3.3}{LCD Slave}{section.3}% 14
+\BOOKMARK [1][-]{section.4}{Discussion}{}% 15
+\BOOKMARK [1][-]{appendix.A}{Peltier Effect Theory}{}% 16
+\BOOKMARK [2][-]{subsection.A.1}{Thermoelectric equation}{appendix.A}% 17
+\BOOKMARK [1][-]{appendix.B}{Master Flowchart}{}% 18
+\BOOKMARK [1][-]{figure.caption.2}{References}{}% 19
